@@ -1,0 +1,68 @@
+const express = require('express')
+const bodyParser = require('body-parser')
+const app = express()
+
+app.use(bodyParser.json())
+
+let customers = [{
+        id: '1588323375416',
+        firstName: 'John',
+        lastName: 'Johnson',
+        email: 'john@johnson.com',
+        phone: '8233243'
+    },
+    {
+        id: '1588323375417',
+        firstName: 'Mary',
+        lastName: 'Smith',
+        email: 'mary@smith.com',
+        phone: '6654113'
+    },
+    {
+        id: '1588323375418',
+        firstName: 'Peter',
+        lastName: 'North',
+        email: 'peter@north.com',
+        phone: '901176'
+    },
+]
+
+
+app.get('/api/customers', (req, res) => {
+    res.send(customers)
+})
+app.get('/api/customers/:id', (req, res) => {
+    const customer = customers.find(item => item.id === req.params.id)
+    customer ? res.send(customer) : res.status(404).end(() => console.log('customer not found'))
+})
+app.post('/api/customers', (req, res) => {
+    const newCustomer = {
+        id: Date.now().toString(),
+        ...req.body
+    }
+    customers = [...customers, newCustomer]
+    res.json(newCustomer)
+})
+app.delete('/api/customers/:id', (req, res) => {
+    const id = req.params.id
+    customers = customers.filter(customer => customer.id !== id)
+    res.status(204).end()
+})
+app.put("/api/customers/:id", (req, res) => {
+    const id = req.params.id;
+    const updatedCustomer = {
+        'id': id,
+        ...req.body
+    };
+    const index = customers.findIndex(customer => customer.id === id)
+    customers.splice(index, 1, updatedCustomer)
+
+    res.json(updatedCustomer)
+})
+
+
+const port = 3001
+
+app.listen(port, () => {
+    console.log(`Server is running on port http://localhost:${port}.`)
+})
